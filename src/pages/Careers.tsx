@@ -15,19 +15,21 @@ export default function Careers() {
   return (
     <>
       {/* Hero Section */}
-      <header className="relative min-h-[500px] flex flex-col bg-brand-dark overflow-hidden">
+      <header className="relative min-h-[650px] lg:min-h-[700px] flex flex-col justify-center bg-brand-dark overflow-hidden">
         {/* Background Layer with Gradient & Image */}
-        <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-gradient-to-b from-brand-dark/95 via-brand-dark/70 to-brand-dark/20 z-10" />
+        <div className="absolute inset-0 z-0 overflow-hidden">
+          {/* Exact gradient from home and about pages */}
+          <div className="absolute inset-0 bg-gradient-to-b from-brand-dark/95 via-brand-dark/75 to-brand-dark/30 z-10" />
           <img 
-            src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=2000&q=80" 
+            src="https://images.unsplash.com/photo-1531538606174-0f90ff5dce83?auto=format&fit=crop&w=2000&q=80" 
             alt="Careers hero background" 
-            className="w-full h-full object-cover object-center opacity-40" 
+            className="absolute inset-0 w-full h-full object-cover object-center" 
+            referrerPolicy="no-referrer"
           />
         </div>
 
         {/* Hero Content */}
-        <div className="relative z-20 pt-48 pb-20 flex flex-col items-start text-left px-4 md:px-8 xl:px-16 max-w-7xl mx-auto w-full">
+        <div className="relative z-20 pt-48 pb-32 flex flex-col items-start text-left px-12 md:px-20 xl:px-24 max-w-7xl mx-auto w-full">
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

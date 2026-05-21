@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import { Target, ShieldCheck, TrendingUp } from 'lucide-react';
+import { Target, ShieldCheck, TrendingUp, Compass } from 'lucide-react';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
@@ -7,22 +7,23 @@ export default function About() {
   return (
     <>
       {/* Hero Section */}
-      <header className="relative min-h-[500px] flex flex-col bg-brand-dark overflow-hidden">
+      <header className="relative min-h-[650px] lg:min-h-[700px] flex flex-col justify-center bg-brand-dark overflow-hidden">
         {/* Background Layer with Gradient & Image Logic like Home */}
-        <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 z-0 overflow-hidden">
           {/* Exact gradient from home page */}
-          <div className="absolute inset-0 bg-gradient-to-b from-brand-dark/95 via-brand-dark/70 to-brand-dark/20 z-10" />
+          <div className="absolute inset-0 bg-gradient-to-b from-brand-dark/95 via-brand-dark/75 to-brand-dark/30 z-10" />
           
-          {/* Placeholder for the hero image (same test image from home for consistency) */}
+          {/* Background image */}
           <img 
-            src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=2000&q=80" 
+            src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=2000&q=80" 
             alt="About hero background" 
-            className="w-full h-full object-cover object-center opacity-40" 
+            className="absolute inset-0 w-full h-full object-cover object-center" 
+            referrerPolicy="no-referrer"
           />
         </div>
 
         {/* Hero Section Content */}
-        <div className="relative z-20 pt-48 pb-20 flex flex-col items-start text-left px-4 md:px-8 xl:px-16 max-w-7xl mx-auto w-full">
+        <div className="relative z-20 pt-48 pb-32 flex flex-col items-start text-left px-12 md:px-20 xl:px-24 max-w-7xl mx-auto w-full">
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -41,37 +42,65 @@ export default function About() {
         </div>
       </header>
 
-      {/* Mission and Strategy Section */}
+      {/* Mission and Vision Section */}
       <section className="py-24 px-4 md:px-8 xl:px-16 max-w-7xl mx-auto">
-        <h2 className="text-brand-dark text-4xl font-bold text-center mb-16 flex flex-col items-center gap-4 uppercase tracking-tight">
-          Mission and Strategy
-          <span className="w-80 h-[2px] bg-brand-orange" />
-        </h2>
-        
-        <div className="grid md:grid-cols-2 gap-12">
-          {/* Left Column */}
-          <div className="space-y-12">
-            <div className="aspect-video bg-brand-placeholder-alt" />
-            <div className="space-y-8">
-              <p className="text-[#333] text-[14px] leading-relaxed">
-                Our mission is to curtail the dereliction in the project execution among Nigerian company through the deployment of our professional, competent and committed personnel in handling our client's projects.
-              </p>
-              <p className="text-[#333] text-[14px] leading-relaxed">
-                EXPINNO LIMITED is committed to putting its Clients first and to promote long-term relationships within the Private and Public sectors.
-              </p>
-            </div>
+        <div className="relative overflow-hidden bg-white border border-gray-100/90 shadow-sm rounded-2xl py-20 px-8 md:px-16 xl:px-20">
+          {/* Subtle global network background image */}
+          <div className="absolute inset-0 z-0 opacity-[0.16] pointer-events-none select-none">
+            <img 
+              src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=2000&q=80" 
+              alt="Global map background pattern" 
+              className="w-full h-full object-cover object-center" 
+              referrerPolicy="no-referrer"
+            />
           </div>
-          
-          {/* Right Column */}
-          <div className="space-y-12">
-            <div className="aspect-video bg-brand-placeholder-alt" />
-            <div className="space-y-8">
-              <p className="text-[#333] text-[14px] leading-relaxed">
-                Expinno's objective is to deliver optimal cost effective solutions that fulfill the Client's, Engineer's, and Local Authority's specifications and requirements expeditiously, and with complete legitimacy.
-              </p>
-              <p className="text-[#333] text-[14px] leading-relaxed">
-                Our success greatly depends on our proven capability to adapt to the unique, changing, and challenging developmental needs of Nigeria and Africa at large.
-              </p>
+
+          <div className="relative z-10">
+            <h2 className="text-brand-dark text-4xl font-bold text-center mb-16 flex flex-col items-center gap-4 uppercase tracking-tight">
+              Mission and Vision
+              <span className="w-80 h-[2px] bg-brand-orange" />
+            </h2>
+            
+            <div className="grid md:grid-cols-2 gap-12 md:gap-20">
+              {/* Left Column - Mission */}
+              <div className="space-y-6 flex flex-col justify-start">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-full bg-brand-orange/10 flex items-center justify-center shrink-0">
+                    <Target className="w-6 h-6 text-brand-orange" />
+                  </div>
+                  <h3 className="text-brand-dark text-2xl font-bold uppercase tracking-tight">
+                    Our Mission
+                  </h3>
+                </div>
+                <div className="space-y-6 text-[#333] text-[15px] leading-relaxed font-semibold">
+                  <p>
+                    Our mission is to curtail the dereliction in the project execution among Nigerian companies through the deployment of our professional, competent, and committed personnel in handling our client's projects.
+                  </p>
+                  <p>
+                    EXPINNO LIMITED is committed to putting its Clients first and to promote long-term relationships within the Private and Public sectors.
+                  </p>
+                </div>
+              </div>
+              
+              {/* Right Column - Vision */}
+              <div className="space-y-6 flex flex-col justify-start">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-full bg-brand-orange/10 flex items-center justify-center shrink-0">
+                    <Compass className="w-6 h-6 text-brand-orange" />
+                  </div>
+                  <h3 className="text-brand-dark text-2xl font-bold uppercase tracking-tight">
+                    Our Vision
+                  </h3>
+                </div>
+                <div className="space-y-6 text-[#333] text-[15px] leading-relaxed font-semibold">
+                  <p>
+                    Expinno's objective is to deliver optimal cost-effective solutions that fulfill the Client's, Engineer's, and Local Authority's specifications and requirements expeditiously, and with complete legitimacy.
+                  </p>
+                  <p>
+                    Our success greatly depends on our proven capability to adapt to the unique, changing, and challenging developmental needs of Nigeria and Africa at large.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>

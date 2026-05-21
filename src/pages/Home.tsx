@@ -26,6 +26,47 @@ export default function Home() {
   const [news, setNews] = useState<RSSItem[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const heroSlides = [
+    {
+      category: "Marine Support Services",
+      headline: "Mobilizing certified marine support fleets within 48 hours to cut operational downtime by 30%.",
+      image: "https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=2000&q=80",
+      buttonText: "Learn more",
+      link: "/businesses"
+    },
+    {
+      category: "Facility Maintenance",
+      headline: "Reducing unscheduled offshore terminal downtime through proactive maintenance strategies.",
+      image: "https://images.unsplash.com/photo-1516937941344-00b4e0337589?auto=format&fit=crop&w=2000&q=80",
+      buttonText: "Learn more",
+      link: "/businesses"
+    },
+    {
+      category: "Equipment & Material Supply",
+      headline: "Accelerating key equipment deliveries to prevent costly shutdowns during critical production cycles.",
+      image: "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=2000&q=80",
+      buttonText: "Learn more",
+      link: "/businesses"
+    }
+  ];
+
+  const [activeHeroIndex, setActiveHeroIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveHeroIndex(prev => (prev + 1) % heroSlides.length);
+    }, 8000);
+    return () => clearInterval(timer);
+  }, [heroSlides.length]);
+
+  const nextHeroSlide = () => {
+    setActiveHeroIndex(prev => (prev + 1) % heroSlides.length);
+  };
+
+  const prevHeroSlide = () => {
+    setActiveHeroIndex(prev => (prev - 1 + heroSlides.length) % heroSlides.length);
+  };
+
   useEffect(() => {
     fetch('/api/rss')
       .then(res => res.json())
@@ -99,7 +140,7 @@ export default function Home() {
     {
       title: "Middle East Terminal Expansion",
       desc: "Engineering and facility maintenance for a major terminal expansion project in the Middle East, delivered on time and under budget.",
-      image: "https://images.unsplash.com/photo-1441333332162-951972ca0012?q=80&w=1000&auto=format&fit=crop",
+      image: "https://images.unsplash.com/photo-1535730143503-0dfdb7aa6d45?q=80&w=1000&auto=format&fit=crop",
     }
   ];
 
@@ -143,61 +184,89 @@ export default function Home() {
   return (
     <>
       {/* 2. Main Navbar with Hero Background (Subtle Gradient) */}
-      <header className="relative min-h-[600px] flex flex-col bg-brand-dark">
-        {/* Background Layer with Gradient & Hero Image */}
+      <header className="relative min-h-[650px] lg:min-h-[700px] flex flex-col justify-center bg-brand-dark overflow-hidden">
+        {/* Background Layer with Gradient & Crossfading Hero Images */}
         <div className="absolute inset-0 z-0 overflow-hidden">
-          {/* Subtle Gradient Overlay - ensuring text remain readable and blend is smooth */}
-          <div className="absolute inset-0 bg-gradient-to-b from-brand-dark/95 via-brand-dark/70 to-brand-dark/20 z-10" />
+          {/* Subtle Gradient Overlay - ensuring text remains readable and blend is smooth */}
+          <div className="absolute inset-0 bg-gradient-to-b from-brand-dark/95 via-brand-dark/75 to-brand-dark/30 z-10" />
           
-          {/* Main Hero Background Image - Using a verified robust Unsplash URL */}
-          <img 
-            src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=2000&q=80" 
-            alt="Hero background beauty portrait" 
-            className="w-full h-full object-cover object-center"
-          />
+          {heroSlides.map((slide, idx) => (
+            <motion.img 
+              key={idx}
+              src={slide.image} 
+              alt={slide.category} 
+              className="absolute inset-0 w-full h-full object-cover object-center"
+              initial={{ opacity: 0, scale: 1.05 }}
+              animate={{ 
+                opacity: idx === activeHeroIndex ? 1 : 0,
+                scale: idx === activeHeroIndex ? 1 : 1.05
+              }}
+              transition={{ duration: 1.2 }}
+            />
+          ))}
         </div>
 
         {/* 3. Hero Section Content */}
         <div className="relative z-20 pt-48 pb-32 flex flex-col items-start text-left px-12 md:px-20 xl:px-24 max-w-7xl mx-auto w-full">
-          <motion.h1 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-white text-5xl md:text-6xl font-bold max-w-4xl leading-[1.1] tracking-tight"
-          >
-            Lorem Ipsum Is Simply
-          </motion.h1>
-          <motion.p 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-white/80 text-lg mt-6 max-w-2xl font-light"
-          >
-            Lorem Ipsum is simply dummy text of the print
-          </motion.p>
+          <div className="min-h-[140px] sm:min-h-[160px] md:min-h-[180px] flex flex-col items-start justify-center">
+            <motion.h1 
+              key={`hl-${activeHeroIndex}`}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="text-white text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold max-w-5xl leading-[1.25] tracking-tight"
+            >
+              {heroSlides[activeHeroIndex].headline}
+            </motion.h1>
+          </div>
           
-          <motion.button 
-            initial={{ opacity: 0, scale: 0.9 }}
+          <motion.div
+            key={`btn-${activeHeroIndex}`}
+            initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2 }}
-            className="mt-12 px-10 py-3.5 bg-brand-blue text-white text-[13px] font-bold rounded-md hover:bg-brand-blue/90 transition-all uppercase tracking-wider"
+            transition={{ duration: 0.4, delay: 0.2 }}
+            className="mt-8"
           >
-            Somes Us
-          </motion.button>
+            <Link 
+              to={heroSlides[activeHeroIndex].link}
+              className="inline-block px-10 py-3.5 bg-brand-blue text-white text-[13px] font-bold rounded-md hover:bg-brand-orange transition-all uppercase tracking-wider shadow-lg hover:shadow-brand-orange/20"
+            >
+              {heroSlides[activeHeroIndex].buttonText}
+            </Link>
+          </motion.div>
 
-          {/* Hero Indicator/Slider Elements */}
-          <div className="absolute left-2 md:left-6 top-1/2 -translate-y-1/2 flex flex-col gap-4">
-            <button className="w-8 h-8 rounded-full bg-brand-orange flex items-center justify-center text-white hover:bg-brand-orange/80 transition-colors focus:outline-none">
-              <ChevronLeft size={18} />
+          {/* Hero Navigation Buttons */}
+          <div className="absolute left-2 md:left-6 top-1/2 -translate-y-1/2 flex flex-col gap-4 z-30">
+            <button 
+              onClick={prevHeroSlide}
+              className="w-10 h-10 rounded-full bg-brand-dark/50 border border-white/20 flex items-center justify-center text-white hover:bg-brand-orange hover:border-brand-orange transition-all focus:outline-none backdrop-blur-sm cursor-pointer"
+              aria-label="Previous slide"
+            >
+              <ChevronLeft size={20} />
             </button>
           </div>
-          <div className="absolute right-2 md:right-6 top-1/2 -translate-y-1/2 flex flex-col gap-4">
-            <button className="w-8 h-8 rounded-full bg-brand-orange flex items-center justify-center text-white hover:bg-brand-orange/80 transition-colors focus:outline-none">
-              <ChevronRight size={18} />
+          <div className="absolute right-2 md:right-6 top-1/2 -translate-y-1/2 flex flex-col gap-4 z-30">
+            <button 
+              onClick={nextHeroSlide}
+              className="w-10 h-10 rounded-full bg-brand-dark/50 border border-white/20 flex items-center justify-center text-white hover:bg-brand-orange hover:border-brand-orange transition-all focus:outline-none backdrop-blur-sm cursor-pointer"
+              aria-label="Next slide"
+            >
+              <ChevronRight size={20} />
             </button>
           </div>
           
-          <div className="mt-28 w-32 h-[3.5px] bg-white/20 relative">
-            <div className="absolute left-0 top-0 h-full w-12 bg-white" />
+          {/* Custom Horizontal Segmented Progress Indicator */}
+          <div className="mt-16 flex gap-3 h-[3px] w-48 bg-white/10 rounded-full overflow-hidden">
+            {heroSlides.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => setActiveHeroIndex(idx)}
+                className={`flex-grow h-full transition-all duration-500 cursor-pointer ${
+                  idx === activeHeroIndex ? 'bg-brand-orange' : 'bg-white/20 hover:bg-white/50'
+                }`}
+                aria-label={`Go to slide ${idx + 1}`}
+              />
+            ))}
           </div>
         </div>
       </header>

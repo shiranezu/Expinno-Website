@@ -25,7 +25,7 @@ const businessData = [
     header: "Equipment & Material Supply",
     subHeading: "Supply services",
     text: "Expinno delivers reliable, traceable supply solutions for mission-critical components required across the energy and maritime industries. Through strategic partnerships with leading OEMs and rigorous quality control, we ensure that every piece of equipment meets or exceeds global performance and compliance standards.",
-    image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=1200&auto=format&fit=crop"
+    image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=1200&auto=format&fit=crop"
   },
   {
     header: "Shipping & Ship Management",
@@ -45,23 +45,25 @@ export default function Businesses() {
   return (
     <div className="bg-white">
       {/* Hero Section */}
-      <header className="relative min-h-[500px] flex flex-col bg-brand-dark overflow-hidden">
+      <header className="relative min-h-[650px] lg:min-h-[700px] flex flex-col justify-center bg-brand-dark overflow-hidden">
         {/* Background Layer with Gradient & Image */}
-        <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-gradient-to-b from-brand-dark/95 via-brand-dark/70 to-brand-dark/20 z-10" />
+        <div className="absolute inset-0 z-0 overflow-hidden">
+          {/* Exact gradient from home and about pages */}
+          <div className="absolute inset-0 bg-gradient-to-b from-brand-dark/95 via-brand-dark/75 to-brand-dark/30 z-10" />
           <img 
-            src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=2000&q=80" 
+            src="https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=2000&q=80" 
             alt="Businesses hero background" 
-            className="w-full h-full object-cover object-center" 
+            className="absolute inset-0 w-full h-full object-cover object-center" 
+            referrerPolicy="no-referrer"
           />
         </div>
 
         {/* Hero Content */}
-        <div className="relative z-20 pt-48 pb-20 flex flex-col items-start text-left px-4 md:px-8 xl:px-16 max-w-7xl mx-auto w-full">
+        <div className="relative z-20 pt-48 pb-32 flex flex-col items-start text-left px-12 md:px-20 xl:px-24 max-w-7xl mx-auto w-full">
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-white text-5xl md:text-6xl font-extrabold tracking-tight uppercase"
+            className="text-white text-5xl md:text-6xl font-bold tracking-tight uppercase"
           >
             OUR BUSINESSES
           </motion.h1>

@@ -42,9 +42,9 @@ export default function About() {
         </div>
       </header>
 
-      {/* Mission and Vision Section */}
+      {/* What we do Section */}
       <section className="py-24 px-4 md:px-8 xl:px-16 max-w-7xl mx-auto">
-        <div className="relative overflow-hidden bg-white border border-gray-100/90 shadow-sm rounded-2xl py-20 px-8 md:px-16 xl:px-20">
+        <div className="relative overflow-hidden bg-white border border-gray-100/90 shadow-sm rounded-2xl py-20 px-8 md:px-16 xl:px-20 text-center">
           {/* Subtle global network background image */}
           <div className="absolute inset-0 z-0 opacity-[0.16] pointer-events-none select-none">
             <img 
@@ -55,53 +55,15 @@ export default function About() {
             />
           </div>
 
-          <div className="relative z-10">
-            <h2 className="text-brand-dark text-4xl font-bold text-center mb-16 flex flex-col items-center gap-4 uppercase tracking-tight">
-              Mission and Vision
-              <span className="w-80 h-[2px] bg-brand-orange" />
+          <div className="relative z-10 max-w-3xl mx-auto">
+            <h2 className="text-brand-dark text-4xl font-bold flex flex-col items-center gap-4 uppercase tracking-tight mb-8">
+              What we do
+              <span className="w-48 h-[2px] bg-brand-orange" />
             </h2>
             
-            <div className="grid md:grid-cols-2 gap-12 md:gap-20">
-              {/* Left Column - Mission */}
-              <div className="space-y-6 flex flex-col justify-start">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-brand-orange/10 flex items-center justify-center shrink-0">
-                    <Target className="w-6 h-6 text-brand-orange" />
-                  </div>
-                  <h3 className="text-brand-dark text-2xl font-bold uppercase tracking-tight">
-                    Our Mission
-                  </h3>
-                </div>
-                <div className="space-y-6 text-[#333] text-[15px] leading-relaxed font-semibold">
-                  <p>
-                    Our mission is to curtail the dereliction in the project execution among Nigerian companies through the deployment of our professional, competent, and committed personnel in handling our client's projects.
-                  </p>
-                  <p>
-                    EXPINNO LIMITED is committed to putting its Clients first and to promote long-term relationships within the Private and Public sectors.
-                  </p>
-                </div>
-              </div>
-              
-              {/* Right Column - Vision */}
-              <div className="space-y-6 flex flex-col justify-start">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-brand-orange/10 flex items-center justify-center shrink-0">
-                    <Compass className="w-6 h-6 text-brand-orange" />
-                  </div>
-                  <h3 className="text-brand-dark text-2xl font-bold uppercase tracking-tight">
-                    Our Vision
-                  </h3>
-                </div>
-                <div className="space-y-6 text-[#333] text-[15px] leading-relaxed font-semibold">
-                  <p>
-                    Expinno's objective is to deliver optimal cost-effective solutions that fulfill the Client's, Engineer's, and Local Authority's specifications and requirements expeditiously, and with complete legitimacy.
-                  </p>
-                  <p>
-                    Our success greatly depends on our proven capability to adapt to the unique, changing, and challenging developmental needs of Nigeria and Africa at large.
-                  </p>
-                </div>
-              </div>
-            </div>
+            <p className="text-slate-700 text-lg md:text-xl leading-relaxed font-semibold font-sans">
+              We help clients achieve operational resilience in the world’s most demanding environments by combining deep sector expertise with an innovation-first mindset to deliver smarter, safer, and more sustainable operations.
+            </p>
           </div>
         </div>
       </section>
@@ -154,47 +116,6 @@ export default function About() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {[1, 2, 3].map((i) => (
             <div key={i} className="aspect-[3/4] bg-brand-placeholder-alt" />
-          ))}
-        </div>
-      </section>
-
-      {/* Our Difference Section */}
-      <section className="py-24 px-4 md:px-8 xl:px-16 max-w-7xl mx-auto text-center bg-gray-50/50">
-        <h2 className="text-brand-dark text-4xl font-bold mb-16 flex flex-col items-center gap-4 uppercase tracking-tight">
-          Our Difference
-          <span className="w-64 h-[2px] bg-brand-orange" />
-        </h2>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {[
-            {
-              icon: <Target className="text-white w-8 h-8" />,
-              text: "Tailored Solutions for Critical Energy Environments"
-            },
-            {
-              icon: <ShieldCheck className="text-white w-8 h-8" />,
-              text: "Deep Understanding of Local Content and Compliance"
-            },
-            {
-              icon: <TrendingUp className="text-white w-8 h-8" />,
-              text: "Future-Forward Thinking Rooted in Technical Discipline"
-            }
-          ].map((item, idx) => (
-            <motion.div 
-              key={idx}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: idx * 0.1 }}
-              viewport={{ once: true }}
-              className="bg-white p-8 border-2 border-gray-100 border-t-4 border-t-brand-orange flex flex-col items-center text-center group transition-all duration-300"
-            >
-              <div className="w-20 h-20 bg-brand-dark rounded-full flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-300 ring-4 ring-brand-orange/10">
-                {item.icon}
-              </div>
-              <h3 className="text-brand-dark font-bold text-xl leading-snug uppercase tracking-tight">
-                {item.text}
-              </h3>
-            </motion.div>
           ))}
         </div>
       </section>

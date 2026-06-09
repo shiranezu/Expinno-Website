@@ -1,14 +1,30 @@
 import { motion } from 'motion/react';
 import React from 'react';
-import { MapPin, Mail, Phone, Ship, Settings, ShieldCheck, Box, Anchor, Hammer } from 'lucide-react';
+import { 
+  MapPin, 
+  Mail, 
+  Phone, 
+  Laptop, 
+  Sparkles, 
+  Fuel, 
+  LineChart, 
+  Building2, 
+  Leaf, 
+  Package, 
+  Tractor, 
+  Heart 
+} from 'lucide-react';
 
 const businesses = [
-  { name: "Marine Support Services", icon: Ship, email: "marine@expinno.ng" },
-  { name: "Facility Maintenance", icon: Hammer, email: "maintainance@expinno.ng" },
-  { name: "Integrity Testing", icon: ShieldCheck, email: "general@expinno.ng" },
-  { name: "Equipment & Material Supply", icon: Box, email: "supply@expinno.ng" },
-  { name: "Shipping & Ship Management", icon: Anchor, email: "shipping@expinno.ng" },
-  { name: "Engineering Services", icon: Settings, email: "engineering@expinno.ng" },
+  { name: "TOPP IT CONSULTING", icon: Laptop, email: "topp@expinno.ng", phone: "+234 (0) 900 000 0001" },
+  { name: "EXPINNO LTD", icon: Sparkles, email: "ltd@expinno.ng", phone: "+234 (0) 900 000 0002" },
+  { name: "EXPINNO OIL & GAS", icon: Fuel, email: "oilandgas@expinno.ng", phone: "+234 (0) 900 000 0003" },
+  { name: "EXPINNO CONSULTING", icon: LineChart, email: "consulting@expinno.ng", phone: "+234 (0) 900 000 0004" },
+  { name: "EXPINNO REALTY", icon: Building2, email: "realty@expinno.ng", phone: "+234 (0) 900 000 0005" },
+  { name: "EXPINNO AGRO", icon: Leaf, email: "agro@expinno.ng", phone: "+234 (0) 900 000 0006" },
+  { name: "KAY & AAI LTD", icon: Package, email: "kayandaai@expinno.ng", phone: "+234 (0) 900 000 0007" },
+  { name: "KAY & AAI FARM", icon: Tractor, email: "farm@expinno.ng", phone: "+234 (0) 900 000 0008" },
+  { name: "THE ADEKOLU’S FOUNDATION", icon: Heart, email: "foundation@expinno.ng", phone: "+234 (0) 900 000 0009" },
 ];
 
 export default function Contact() {
@@ -78,7 +94,7 @@ export default function Contact() {
                 
                 <div className="space-y-1.5 mt-auto">
                   <p className="text-[#888] text-[13px] font-medium flex items-center justify-center gap-1.5">
-                    phone: <span className="text-brand-dark">+234 (0) 900 000 0000</span>
+                    phone: <span className="text-brand-dark">{biz.phone}</span>
                   </p>
                   <p className="text-[#888] text-[13px] font-medium flex items-center justify-center gap-1.5">
                     email: <span className="text-brand-dark">{biz.email}</span>

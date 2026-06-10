@@ -192,20 +192,104 @@ async function fetchAndCleanFeed(url: string): Promise<string> {
   return text;
 }
 
-async function startServer() {
-  const app = express();
-  const PORT = 3000;
-  const parser = new Parser();
+function cleanGeminiApiKey(key: string | undefined): string {
+  if (!key) return "";
+  let cleaned = key.trim();
 
-  // Initialize Gemini AI Client
-  const ai = new GoogleGenAI({
-    apiKey: process.env.GEMINI_API_KEY,
+  // Strip zero-width spaces or other common weird invisible characters
+  cleaned = cleaned.replace(/[\u200B-\u200D\uFEFF\u00A0]/g, "");
+
+  // If they pasted a whole line of shell code or .env with the key inside, extract the key portion
+  const lines = cleaned.split(/[\r\n]+/);
+  for (const line of lines) {
+    const trimmedLine = line.trim();
+    if (trimmedLine.includes("AIzaSy")) {
+      const idx = trimmedLine.indexOf("AIzaSy");
+      if (idx !== -1) {
+        let potentialKey = trimmedLine.substring(idx);
+        potentialKey = potentialKey.split(/[\s"';#,`]/)[0];
+        if (potentialKey.length >= 10) {
+          return potentialKey;
+        }
+      }
+    }
+  }
+
+  // Handle typical variable patterns if not matched above
+  if (cleaned.startsWith("export ")) {
+    cleaned = cleaned.substring(7).trim();
+  }
+  if (cleaned.startsWith("GEMINI_API_KEY=")) {
+    cleaned = cleaned.substring(15).trim();
+  } else if (cleaned.startsWith("GEMINI_API_KEY =")) {
+    cleaned = cleaned.substring(16).trim();
+  }
+
+  // Strip matching or mismatched quotes and backticks at the beginning and end
+  while (cleaned.length > 0 && (cleaned.startsWith('"') || cleaned.startsWith("'") || cleaned.startsWith("`"))) {
+    cleaned = cleaned.substring(1);
+  }
+  while (cleaned.length > 0 && (cleaned.endsWith('"') || cleaned.endsWith("'") || cleaned.endsWith("`"))) {
+    cleaned = cleaned.substring(0, cleaned.length - 1);
+  }
+
+  cleaned = cleaned.trim();
+
+  // Strip trailing punctuation or comment blocks
+  const hashIdx = cleaned.indexOf("#");
+  if (hashIdx !== -1) {
+    cleaned = cleaned.substring(0, hashIdx).trim();
+  }
+  if (cleaned.endsWith(";")) {
+    cleaned = cleaned.slice(0, -1).trim();
+  }
+  if (cleaned.endsWith(",")) {
+    cleaned = cleaned.slice(0, -1).trim();
+  }
+
+  return cleaned;
+}
+
+function isValidGeminiApiKey(key: string | undefined): boolean {
+  const cleaned = cleanGeminiApiKey(key);
+  console.log(`[Diagnostic] API key checks - RAW exists: ${!!key}, RAW length: ${key ? key.length : 0}`);
+  console.log(`[Diagnostic] Cleaned exists: ${!!cleaned}, Cleaned length: ${cleaned.length}`);
+  if (cleaned) {
+    console.log(`[Diagnostic] First 4 chars: ${cleaned.slice(0, 4)}, Last 4 chars: ${cleaned.slice(-4)}`);
+  }
+  
+  if (
+    !cleaned ||
+    cleaned === "" ||
+    cleaned === "undefined" ||
+    cleaned === "null" ||
+    cleaned.startsWith("YOUR_") ||
+    cleaned === "YOUR_GEMINI_API_KEY" ||
+    cleaned === "MY_GEMINI_API_KEY" ||
+    cleaned.length < 10
+  ) {
+    return false;
+  }
+  
+  return true;
+}
+
+function getGeminiClient(): GoogleGenAI {
+  const apiKey = cleanGeminiApiKey(process.env.GEMINI_API_KEY);
+  return new GoogleGenAI({
+    apiKey: apiKey,
     httpOptions: {
       headers: {
         'User-Agent': 'aistudio-build',
       }
     }
   });
+}
+
+async function startServer() {
+  const app = express();
+  const PORT = 3000;
+  const parser = new Parser();
 
   // Middleware for parsing JSON requests
   app.use(express.json());
@@ -263,11 +347,19 @@ async function startServer() {
       return res.status(400).json({ error: "Title is required for analysis." });
     }
 
-    // 1. Check if the key is missing or is a placeholder
+    // 1. Check if the key is missing or is a placeholder/invalid
     const key = process.env.GEMINI_API_KEY;
-    if (!key || key.trim() === "" || key === "YOUR_GEMINI_API_KEY" || key.startsWith("YOUR_")) {
-      console.log("GEMINI_API_KEY is missing/placeholder. Emitting high-fidelity fallback analysis.");
+    if (!isValidGeminiApiKey(key)) {
+      console.log("GEMINI_API_KEY is missing, custom placeholder, or invalid format. Emitting high-fidelity fallback analysis.");
       const fallback = getFallbackAnalysis(title, snippet || "", category || "", link || "");
+      const cleaned = cleanGeminiApiKey(key);
+      if (!cleaned) {
+        fallback.explanation = "This analysis was generated via Expinno Smart Fallback Engine. No GEMINI_API_KEY environment variable was found in the environment. Please add it via Settings > Secrets.";
+      } else if (cleaned.length < 10) {
+        fallback.explanation = `This analysis was generated via Expinno Smart Fallback Engine. The key currently configured ("${cleaned}") is too short (length ${cleaned.length}). Please add a valid Gemini API key in Settings > Secrets.`;
+      } else {
+        fallback.explanation = `This analysis was generated via Expinno Smart Fallback Engine. The key currently configured is identified as a placeholder (value: "${cleaned}"). Please replace it with your real Gemini API key in Settings > Secrets.`;
+      }
       return res.json(fallback);
     }
 
@@ -280,7 +372,7 @@ URL: ${link || ""}
 
 Provide an insightful, realistic interpretation of what this news means for stock prices, sector liquidity, investor sentiment, and general policy. Focus specifically on the African demographic, centering on technology, trade, stock, economy, and agriculture developments across the continent. Format the result strictly with the provided JSON schema. Ensure sentiment, affectedSectors, keyTakeaways, riskRating, and strategicAdvisory are highly relevant to the provided news.`;
 
-      const response = await ai.models.generateContent({
+      const response = await getGeminiClient().models.generateContent({
         model: "gemini-3.5-flash",
         contents: prompt,
         config: {
@@ -341,10 +433,12 @@ Provide an insightful, realistic interpretation of what this news means for stoc
       // Ensure we include isDemo: false to tell the client this is a real AI generated analysis
       res.json({ ...analysisData, isDemo: false });
     } catch (error: any) {
-      console.warn("Gemini API call failed (falling back to Expinno Fallback Engine):", error?.message || error);
+      console.log("Gemini API call failed (falling back to Expinno Fallback Engine):", error?.message || error);
       const fallback = getFallbackAnalysis(title, snippet || "", category || "", link || "");
-      // Supplement the fallback feedback
-      fallback.explanation = `The Expinno AI live analyzer is currently utilizing offline expert knowledge modules due to transient gateway settings on the project container. (Live API returned: ${error?.message || "Invalid Key Validation"}). To re-enable full online summaries, confirm parameters in Settings > Secrets.`;
+      const keyVal = cleanGeminiApiKey(process.env.GEMINI_API_KEY);
+      const firstFour = keyVal.slice(0, 4);
+      const lastFour = keyVal.slice(-4);
+      fallback.explanation = `The Expinno AI live analyzer is currently utilizing offline expert knowledge modules due to transient gateway settings on the project container. (Live API returned: ${error?.message || "Invalid Key Validation"}). Debug: Currently loaded key starts with "${firstFour}" and ends with "${lastFour}" (total length: ${keyVal.length}). Please verify that your key is valid and active on Google AI Studio.`;
       res.json(fallback);
     }
   });
@@ -357,8 +451,16 @@ Provide an insightful, realistic interpretation of what this news means for stoc
     }
 
     const key = process.env.GEMINI_API_KEY;
-    if (!key || key.trim() === "" || key === "YOUR_GEMINI_API_KEY" || key.startsWith("YOUR_")) {
+    if (!isValidGeminiApiKey(key)) {
       const fallback = getFallbackSummary(title, snippet || "", category || "");
+      const cleaned = cleanGeminiApiKey(key);
+      if (!cleaned) {
+        fallback.explanation = "This summary was produced via Expinno Smart Fallback Summarizer. No GEMINI_API_KEY was found in the environment. Please add it via Settings > Secrets.";
+      } else if (cleaned.length < 10) {
+        fallback.explanation = `This summary was produced via Expinno Smart Fallback Summarizer. The key currently configured ("${cleaned}") is too short (length ${cleaned.length}). Populate GEMINI_API_KEY in Settings > Secrets.`;
+      } else {
+        fallback.explanation = `This summary was produced via Expinno Smart Fallback Summarizer. The key currently configured is identified as a placeholder (value: "${cleaned}"). Please replace it with your real Gemini API key in Settings > Secrets.`;
+      }
       return res.json(fallback);
     }
 
@@ -371,7 +473,7 @@ URL: ${link || ""}
 
 Produce exactly 3 clear, highly legible bullet points highlighting the story events/narrative facts. At the end, provide a single, professional but easily readable conclusion (1-2 sentences) under the property name 'conclusion'. Formulate strictly as JSON in the provided schema.`;
 
-      const response = await ai.models.generateContent({
+      const response = await getGeminiClient().models.generateContent({
         model: "gemini-3.5-flash",
         contents: prompt,
         config: {
@@ -402,9 +504,12 @@ Produce exactly 3 clear, highly legible bullet points highlighting the story eve
       const summaryData = JSON.parse(responseText.trim());
       res.json({ ...summaryData, isDemo: false });
     } catch (error: any) {
-      console.warn("Gemini summarizer error:", error?.message || error);
+      console.log("Gemini summarizer fallback triggered:", error?.message || error);
       const fallback = getFallbackSummary(title, snippet || "", category || "");
-      fallback.explanation = `The Expinno AI quick summarizer is running on dynamic offline expert modules. (Live API returned: ${error?.message || "Invalid Key Validation"}).`;
+      const keyVal = cleanGeminiApiKey(process.env.GEMINI_API_KEY);
+      const firstFour = keyVal.slice(0, 4);
+      const lastFour = keyVal.slice(-4);
+      fallback.explanation = `The Expinno AI quick summarizer is running on dynamic offline expert modules. (Live API returned: ${error?.message || "Invalid Key Validation"}). Debug: Currently loaded key starts with "${firstFour}" and ends with "${lastFour}" (total length: ${keyVal.length}). Please verify that your key is valid and active on Google AI Studio.`;
       res.json(fallback);
     }
   });

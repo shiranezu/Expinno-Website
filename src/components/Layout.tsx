@@ -67,7 +67,7 @@ export default function Layout({ children }: LayoutProps) {
             <img 
               src="/logo.png" 
               alt="Expinno Groups" 
-              className="h-36 md:h-44 lg:h-48 w-auto object-contain transition-all -my-6 md:-my-9 lg:-my-12"
+              className="h-48 md:h-60 lg:h-64 w-auto object-contain transition-all -my-12 md:-my-16 lg:-my-20"
               onError={() => setHeaderLogoFailed(true)}
               referrerPolicy="no-referrer"
             />

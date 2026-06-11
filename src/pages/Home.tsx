@@ -535,7 +535,7 @@ export default function Home() {
         </div>
 
         {/* 3. Hero Section Content */}
-        <div className="relative z-20 pt-48 pb-32 flex flex-col items-start text-left px-12 md:px-20 xl:px-24 max-w-7xl mx-auto w-full">
+        <div className="relative z-20 pt-48 pb-32 flex flex-col items-start text-left px-6 sm:px-12 md:px-20 xl:px-24 max-w-7xl mx-auto w-full">
           <div className="min-h-[180px] sm:min-h-[200px] md:min-h-[220px] flex flex-col items-start justify-center">
             <motion.div
               key={`cat-${activeHeroIndex}`}

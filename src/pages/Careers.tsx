@@ -29,7 +29,7 @@ export default function Careers() {
         </div>
 
         {/* Hero Content */}
-        <div className="relative z-20 pt-48 pb-32 flex flex-col items-start text-left px-12 md:px-20 xl:px-24 max-w-7xl mx-auto w-full">
+        <div className="relative z-20 pt-48 pb-32 flex flex-col items-start text-left px-6 sm:px-12 md:px-20 xl:px-24 max-w-7xl mx-auto w-full">
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -165,7 +165,7 @@ export default function Careers() {
             ].map((value, idx) => (
               <motion.div
                 key={idx}
-                className="absolute z-20"
+                className="hidden md:block absolute z-20"
                 animate={{
                   left: ["4%", "96%", "96%", "4%", "4%"],
                   top: ["8%", "8%", "92%", "92%", "8%"],

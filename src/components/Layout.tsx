@@ -1,6 +1,7 @@
-import { Mail, Phone, Globe, Facebook, Twitter, Instagram, Linkedin } from 'lucide-react';
+import { Mail, Phone, Globe, Facebook, Twitter, Instagram, Linkedin, Menu, X, ChevronDown, ChevronUp } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import React from 'react';
+import { AnimatePresence, motion } from 'motion/react';
 
 const subsidiaries = [
   { name: "Topp IT Consulting Ltd", href: "/businesses/topp-it-consulting" },
@@ -23,8 +24,12 @@ export default function Layout({ children }: LayoutProps) {
   const { hash, pathname } = location;
   const [headerLogoFailed, setHeaderLogoFailed] = React.useState(false);
   const [footerLogoFailed, setFooterLogoFailed] = React.useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+  const [mobileSubsidiariesOpen, setMobileSubsidiariesOpen] = React.useState(false);
 
   React.useEffect(() => {
+    setMobileMenuOpen(false);
+    setMobileSubsidiariesOpen(false);
     if (hash) {
       const id = hash.replace('#', '');
       const element = document.getElementById(id);
@@ -67,7 +72,7 @@ export default function Layout({ children }: LayoutProps) {
             <img 
               src="/logo.png" 
               alt="Expinno Groups" 
-              className="h-48 md:h-60 lg:h-64 w-auto object-contain transition-all -my-12 md:-my-16 lg:-my-20"
+              className="h-28 sm:h-44 md:h-60 lg:h-64 w-auto object-contain transition-all -my-7 sm:-my-12 md:-my-16 lg:-my-20"
               onError={() => setHeaderLogoFailed(true)}
               referrerPolicy="no-referrer"
             />
@@ -122,7 +127,102 @@ export default function Layout({ children }: LayoutProps) {
           <li><Link to="/careers" className={`${isCareers ? 'text-brand-orange' : ''} hover:text-brand-orange transition-colors`}>CAREERS</Link></li>
           <li><Link to="/contact" className={`${isContact ? 'text-brand-orange' : ''} hover:text-brand-orange transition-colors`}>CONTACT</Link></li>
         </ul>
+
+        {/* Mobile Menu Toggle Button */}
+        <button
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className="md:hidden flex items-center justify-center text-white hover:text-brand-orange focus:outline-none p-2 transition-colors z-50 bg-brand-dark/40 backdrop-blur-sm rounded border border-white/10 cursor-pointer"
+          aria-label="Toggle menu"
+        >
+          {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+        </button>
       </nav>
+
+      {/* Mobile Menu Panel */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+            className="md:hidden absolute top-20 left-4 right-4 bg-brand-dark/95 backdrop-blur-md border border-white/10 rounded-lg shadow-2xl z-50 overflow-hidden border-t-2 border-t-brand-orange p-6 max-h-[85vh] overflow-y-auto"
+          >
+            <div className="flex flex-col gap-4">
+              <Link 
+                to="/" 
+                className={`text-[12px] font-bold tracking-widest uppercase transition-colors py-2 ${isHome ? 'text-brand-orange' : 'text-white'}`}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                HOME
+              </Link>
+              <Link 
+                to="/about" 
+                className={`text-[12px] font-bold tracking-widest uppercase transition-colors py-2 ${isAbout ? 'text-brand-orange text-bold' : 'text-white'}`}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                ABOUT US
+              </Link>
+              
+              {/* Subsidiaries Collapsible Section */}
+              <div className="border-t border-white/5 pt-2">
+                <button 
+                  onClick={() => setMobileSubsidiariesOpen(!mobileSubsidiariesOpen)}
+                  className={`flex justify-between items-center w-full text-[12px] font-bold tracking-widest uppercase transition-colors py-2 text-left ${isBusinesses ? 'text-brand-orange' : 'text-white'}`}
+                >
+                  <span>SUBSIDIARIES</span>
+                  {mobileSubsidiariesOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                </button>
+                <AnimatePresence initial={false}>
+                  {mobileSubsidiariesOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="overflow-hidden bg-white/5 rounded-sm mt-1"
+                    >
+                      <div className="flex flex-col gap-1 pl-4 py-2">
+                        <Link
+                          to="/businesses"
+                          className="text-[10px] font-bold tracking-wider text-white/70 hover:text-white uppercase py-2"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          All Subsidiaries Overview
+                        </Link>
+                        {subsidiaries.map((sub, i) => (
+                          <Link
+                            key={i}
+                            to={sub.href}
+                            className="text-[10px] font-bold tracking-wider text-white/70 hover:text-white uppercase py-2 border-l border-white/10 pl-3 hover:border-brand-orange transition-all"
+                            onClick={() => setMobileMenuOpen(false)}
+                          >
+                            {sub.name}
+                          </Link>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              <Link 
+                to="/careers" 
+                className={`text-[12px] font-bold tracking-widest uppercase transition-colors py-2 border-t border-white/5 pt-4 ${isCareers ? 'text-brand-orange' : 'text-white'}`}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                CAREERS
+              </Link>
+              <Link 
+                to="/contact" 
+                className={`text-[12px] font-bold tracking-widest uppercase transition-colors py-2 ${isContact ? 'text-brand-orange' : 'text-white'}`}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                CONTACT
+              </Link>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Page Content */}
       <main className="flex-grow">

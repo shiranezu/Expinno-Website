@@ -87,7 +87,7 @@ export default function Businesses() {
         </div>
 
         {/* Hero Content */}
-        <div className="relative z-20 pt-48 pb-32 flex flex-col items-start px-12 md:px-20 xl:px-24 max-w-7xl mx-auto w-full text-left">
+        <div className="relative z-20 pt-48 pb-32 flex flex-col items-start px-6 sm:px-12 md:px-20 xl:px-24 max-w-7xl mx-auto w-full text-left">
           <motion.h1 
             key={`${currentDetails.header}-title`} // Animated transition on route swap
             initial={{ opacity: 0, y: 20 }}

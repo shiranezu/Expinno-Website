@@ -294,49 +294,103 @@ async function startServer() {
   // Middleware for parsing JSON requests
   app.use(express.json());
 
+  // In-memory cache for RSS items to minimize upstream requests and avoid rate limits
+  let cachedNewsItems: any[] = [];
+  let lastFeedFetchTime = 0;
+  const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes cache
+
   // API Route for RSS
   app.get("/api/rss", async (req, res) => {
     try {
-      const feeds = [
-        { url: 'https://techpoint.africa/feed/', category: 'Technology' },
-        { url: 'https://premiumtimesng.com/category/business/feed', category: 'Trade' },
-        { url: 'https://nairametrics.com/category/financial-services/feed/', category: 'Stock' },
-        { url: 'https://nairametrics.com/feed/', category: 'Economy' },
-        { url: 'https://premiumtimesng.com/category/agriculture/feed', category: 'Agriculture' }
+      const now = Date.now();
+      if (cachedNewsItems.length > 0 && now - lastFeedFetchTime < CACHE_TTL_MS) {
+        return res.json({ items: cachedNewsItems.slice(0, 6) });
+      }
+
+      const feedGroups = [
+        {
+          category: 'Technology',
+          urls: [
+            'https://techcabal.com/feed/',
+            'https://news.google.com/rss/headlines/section/topic/TECHNOLOGY?hl=en-NG&gl=NG&ceid=NG:en'
+          ]
+        },
+        {
+          category: 'Trade',
+          urls: [
+            'https://premiumtimesng.com/category/business/feed',
+            'https://businessday.ng/feed/'
+          ]
+        },
+        {
+          category: 'Stock',
+          urls: [
+            'https://nairametrics.com/category/financial-services/feed/',
+            'https://businessday.ng/category/markets/feed/'
+          ]
+        },
+        {
+          category: 'Economy',
+          urls: [
+            'https://nairametrics.com/feed/',
+            'https://businessday.ng/category/economy/feed/'
+          ]
+        },
+        {
+          category: 'Agriculture',
+          urls: [
+            'https://premiumtimesng.com/category/agriculture/feed',
+            'https://tribuneonlineng.com/category/agriculture/feed/'
+          ]
+        }
       ];
 
-      const feedPromises = feeds.map(async (f) => {
-        try {
-          const rawFeedXml = await fetchAndCleanFeed(f.url);
-          const fetched = await parser.parseString(rawFeedXml);
-          return fetched.items.map(item => ({
-            title: item.title,
-            link: item.link,
-            pubDate: item.pubDate,
-            contentSnippet: item.contentSnippet,
-            category: f.category
-          }));
-        } catch (e) {
-          console.error(`Failed to fetch ${f.category} feed:`, e);
-          return [];
+      const feedPromises = feedGroups.map(async (group) => {
+        for (const url of group.urls) {
+          try {
+            const rawFeedXml = await fetchAndCleanFeed(url);
+            const fetched = await parser.parseString(rawFeedXml);
+            if (fetched.items && fetched.items.length > 0) {
+              return fetched.items.map(item => ({
+                title: item.title,
+                link: item.link,
+                pubDate: item.pubDate,
+                contentSnippet: item.contentSnippet,
+                category: group.category
+              }));
+            }
+          } catch (err: any) {
+            // Log informative trace without breaking execution and try next fallback url
+            console.log(`[RSS] Source ${url} (${group.category}) unavailable: ${err?.message || err}. Trying next fallback.`);
+          }
         }
+
+        console.warn(`[RSS] All online sources exhausted for ${group.category} category.`);
+        return [];
       });
 
       const results = await Promise.all(feedPromises);
       const allItems = results.flat();
-      
-      // Sort by date (newest first)
-      allItems.sort((a, b) => {
-        const dateA = a.pubDate ? new Date(a.pubDate).getTime() : 0;
-        const dateB = b.pubDate ? new Date(b.pubDate).getTime() : 0;
-        return dateB - dateA;
-      });
 
-      // Return top 6 items for a balanced layout
-      res.json({ items: allItems.slice(0, 6) });
+      if (allItems.length > 0) {
+        // Sort by date (newest first)
+        allItems.sort((a, b) => {
+          const dateA = a.pubDate ? new Date(a.pubDate).getTime() : 0;
+          const dateB = b.pubDate ? new Date(b.pubDate).getTime() : 0;
+          return dateB - dateA;
+        });
+
+        cachedNewsItems = allItems;
+        lastFeedFetchTime = now;
+      }
+
+      // Return items (falling back to previously cached if any temporary network issue occurred)
+      const returnItems = allItems.length > 0 ? allItems : cachedNewsItems;
+      res.json({ items: returnItems.slice(0, 6) });
     } catch (error) {
-      console.error('Error fetching RSS:', error);
-      res.status(500).json({ error: 'Failed to fetch RSS feeds' });
+      console.warn('Warning during RSS processing:', error);
+      // Return cached items if available, or empty array instead of 500
+      res.json({ items: cachedNewsItems.slice(0, 6) });
     }
   });
 
